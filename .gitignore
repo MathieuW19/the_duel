@@ -1723,3 +1723,5 @@ node_modules/uuid/LICENSE.md
 node_modules/uuid/package.json
 node_modules/uuid/README.md
 node_modules/uuid/wrapper.mjs
+crud/api/routes/tasks.js
+crud/api/routes/tasks.js
