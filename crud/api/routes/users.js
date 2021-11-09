@@ -23,23 +23,16 @@ router.post('/', function (req, res, next) {
 
 router.put('/:uuid', function (req, res, next) {
 
-  //TODO : rechercher en BDD l'item dont l'uuid = :uuid
-  //on considère qu'il s'agit du résultat de la requête en BDD dans la table humans
-  const item = {};
+  const uuid = req.params.uuid;
+  const { lastname, firstname } = req.body;
 
-  item.firstname = "John";//obtenu depuis la bdd
-  item.lastname = "Terry";//idem
-
-
-  const { firstname, lastname } = req.body;
-
-  //mise à jour des valeurs à partir des données récupérées dans le body
-  item.firstname = firstname;
-  item.lastname = lastname;
-
-  //TODO: mise à jour en BDD
-
-  res.status(200).json(item);//réponse json avec statut 201
+  data.forEach(d => {
+    if (d.uuid == uuid) {
+      d.firstname = firstname;
+      d.lastname = lastname;
+      res.json(d);
+    }
+  });
 });
 
 router.delete('/:uuid', function (req, res, next) {
