@@ -1399,3 +1399,4 @@ crud/db/data/sys/x@0024waits_by_host_by_latency.frm
 crud/db/data/sys/x@0024waits_by_user_by_latency.frm
 crud/db/data/sys/x@0024waits_global_by_latency.frm
 crud/db/data/tdl_db/db.opt
+crud/db/data/ddl_recovery-backup.log
