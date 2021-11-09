@@ -37,7 +37,12 @@ router.put('/:uuid', function (req, res, next) {
 
 router.delete('/:uuid', function (req, res, next) {
   const uuid = req.params.uuid;//un paramètre dynamique de l'url 
-  res.status(200).json({ message: "DELETE Marche" });
+
+  data.forEach(d => {
+    if (d.uuid == uuid)
+      data.slice(data.indexOf(d), 1);
+  });
+  res.status(200).json({ items: data });
 });
 
 router.get('/:uuid', function (req, res, next) {
