@@ -1,0 +1,61 @@
+version: "3"
+
+networks:
+  tdl:
+    driver: bridge
+
+services:
+  #########################################################
+  # TODOLIST MICRO SERVICE ################################
+  #########################################################
+
+  ###############
+  ### API #######
+  ###############
+
+  tdl_api:
+    container_name: tdl_api
+    image: node:lts
+    env_file:
+      - ./crud/api/.env
+    working_dir: /usr/src/app
+    volumes:
+      - ./crud/api:/usr/src/app
+    command: npm run dev
+    ports:
+      - 3333:3000
+    networks:
+      - tdl
+    depends_on:
+      - tdl_db
+
+  ###############
+  ### DB ########
+  ###############
+  tdl_db:
+    container_name: tdl_db
+    image: mariadb:latest
+    restart: unless-stopped
+    #restart: always #for production only
+    env_file:
+      - ./crud/db/.env
+    volumes:
+      - ./crud/db/data:/var/lib/mysql
+      - ./crud/db/scripts/schema.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./crud/db/scripts/data.sql:/docker-entrypoint-initdb.d/2.sql
+    networks:
+      - tdl
+
+  #############
+  ## ADMINER ##
+  #############
+  tdl_adminer:
+    container_name: tdl_adminer
+    restart: unless-stopped
+    image: adminer
+    ports:
+      - 8181:8080
+    networks:
+      - tdl
+    depends_on:
+      - tdl_db
