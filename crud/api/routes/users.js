@@ -7,51 +7,87 @@ const { v4: uuidv4 } = require('uuid');
 router.get('/', function (req, res, next) {
 
   res.status(200).json({ items: data });
+  
 });
 
 router.post('/', function (req, res, next) {
-  const { uuid, lastname, firstname } = req.body;
+  const { lastname, firstname } = req.body;
+
+  if (lastname === "" || firstname === "") {
+    const error = new Error();
+    error.status = 400;
+    error.message = "Tous les champs doivent être renseignés";
+    throw error;
+  }
 
   const user = {
     uuid: uuidv4(),
     firstname: firstname,
     lastname: lastname,
   };
+  data.push(user);
 
-  res.status(201).json({ user: user });
+  res.status(201).json({ data: data });
 });
 
 router.put('/:uuid', function (req, res, next) {
 
   const uuid = req.params.uuid;
   const { lastname, firstname } = req.body;
+  const item = data.find(d => d.uuid === uuid);
 
-  data.forEach(d => {
-    if (d.uuid == uuid) {
-      d.firstname = firstname;
-      d.lastname = lastname;
-      res.json(d);
-    }
-  });
+  if (lastname === "" || firstname === "") {
+    const error = new Error();
+    error.status = 400;
+    error.message = "Tous les champs doivent être renseignés";
+    throw error;
+  }
+
+  if (item !== undefined) {
+    item.lastname = lastname;
+    item.firstname = firstname;
+    data.push(item);
+    res.status(201).json({ data: data });
+    
+  } else {
+    const error = new Error();
+    error.status = 400;
+    error.message = "Pas d'élément à updater";
+    throw error;
+  }
+
 });
 
 router.delete('/:uuid', function (req, res, next) {
-  const uuid = req.params.uuid;//un paramètre dynamique de l'url 
+  const uuid = req.params.uuid;
 
-  data.forEach(d => {
-    if (d.uuid == uuid)
-      data.slice(data.indexOf(d), 1);
-  });
-  res.status(200).json({ items: data });
+  const item = data.find(d => d.uuid === uuid);
+
+  if (item !== undefined) {
+    data.splice(data.indexOf(item), 1);
+  } else {
+    const error = new Error();
+    error.status = 400;
+    error.message = "Pas d'élément à supprimer";
+    throw error;
+  }
+
+  res.status(200).json({ data: data });
 });
 
 router.get('/:uuid', function (req, res, next) {
   const uuid = req.params.uuid;
 
-  data.forEach(d => {
-    if (d.uuid == uuid)
-      res.json(d);
-  });
+  const item = data.find(d => d.uuid === uuid);
+
+  if (item !== undefined)
+  res.status(200).json({ item: item });
+  else {
+    const error = new Error();
+    error.status = 400;
+    error.message = "Aucun élément avec ce uuid";
+    throw error;
+  }
 
 });
 
