@@ -3,76 +3,76 @@ const router = express.Router();
 
 const data = require('../data/users');
 const { v4: uuidv4 } = require('uuid');
+const knex = require('../knex');
+const TABLE = 'users';
 
-router.get('/', function (req, res, next) {
 
-  res.status(200).json({ items: data });
+router.get('/', async (req, res, next) => {
+  let users;
 
-});
-
-router.post('/', function (req, res, next) {
-  const { lastname, firstname } = req.body;
-
-  if (lastname === "" || firstname === "") {
-    const error = new Error();
-    error.status = 400;
-    error.message = "Tous les champs doivent être renseignés";
-    throw error;
+  try {
+    users = await knex(TABLE).select('*');
+  } catch (error) {
+    next(500);
   }
 
-  const user = {
-    uuid: uuidv4(),
-    firstname: firstname,
-    lastname: lastname,
-  };
-  data.push(user);
+  res.status(200).json({ items: users });
 
-  res.status(201).json({ data: data });
 });
 
-router.put('/:uuid', function (req, res, next) {
+router.post('/', async (req, res, next) => {
+  let users;
 
+  req.body.uuid = uuidv4();
+  knex(TABLE).insert(req.body).then(() => console.log("data inserted"))
+    .catch((err) => { console.log(err); throw err })
+    .finally(() => {
+      knex.destroy();
+    });
+  try {
+    users = await knex(TABLE).select('*');
+  } catch (error) {
+    next(500);
+  }
+
+  res.status(200).json({ items: users });
+});
+
+router.put('/:uuid', async (req, res, next) => {
   const uuid = req.params.uuid;
-  const { lastname, firstname } = req.body;
-  const item = data.find(d => d.uuid === uuid);
+  const { lastname, firstname, email, password } = req.body;
+  let users;
 
-  if (lastname === "" || firstname === "") {
-    const error = new Error();
-    error.status = 400;
-    error.message = "Tous les champs doivent être renseignés";
-    throw error;
+  try {
+    await knex(TABLE).where({ uuid }).update(req.body);
+  } catch (error) {
+    next(500);
+  }
+  try {
+    users = await knex(TABLE).select('*');
+  } catch (error) {
+    next(500);
   }
 
-  if (item !== undefined) {
-    item.lastname = lastname;
-    item.firstname = firstname;
-    data.push(item);
-    res.status(201).json({ data: data });
-
-  } else {
-    const error = new Error();
-    error.status = 400;
-    error.message = "Pas d'élément à updater";
-    throw error;
-  }
-
+  res.status(200).json({ items: users });
 });
 
-router.delete('/:uuid', function (req, res, next) {
+router.delete('/:uuid', async (req, res, next) => {
   const uuid = req.params.uuid;
+  let users;
 
-  const item = data.find(d => d.uuid === uuid);
-
-  if (item !== undefined) {
-    data.splice(data.indexOf(item), 1);
-  } else {
-    const error = new Error();
-    error.status = 400;
-    error.message = "Pas d'élément à supprimer";
-    throw error;
+  try {
+    await knex(TABLE).where({ uuid }).del();
+  } catch (error) {
+    next(500);
+  }
+  try {
+    users = await knex(TABLE).select('*');
+  } catch (error) {
+    next(500);
   }
 
-  res.status(200).json({ data: data });
+  res.status(200).json({ items: users });
 });
 
 router.get('/:uuid', function (req, res, next) {
