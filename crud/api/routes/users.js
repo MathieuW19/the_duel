@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 router.get('/', function (req, res, next) {
 
   res.status(200).json({ items: data });
-  
+
 });
 
 router.post('/', function (req, res, next) {
@@ -48,7 +48,7 @@ router.put('/:uuid', function (req, res, next) {
     item.firstname = firstname;
     data.push(item);
     res.status(201).json({ data: data });
-    
+
   } else {
     const error = new Error();
     error.status = 400;
@@ -81,7 +81,7 @@ router.get('/:uuid', function (req, res, next) {
   const item = data.find(d => d.uuid === uuid);
 
   if (item !== undefined)
-  res.status(200).json({ item: item });
+    res.status(200).json({ item: item });
   else {
     const error = new Error();
     error.status = 400;
