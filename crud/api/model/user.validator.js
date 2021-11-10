@@ -2,10 +2,7 @@ const joi = require('joi');
 
 const schema = joi.object({
     uuid: joi.string()
-    .alphanum()
-    .min(3)
-    .max(30)
-    .required(),
+    .uuid(),
 
     email: joi.string()
     .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'fr'] } }),
@@ -21,23 +18,7 @@ const schema = joi.object({
     .required(),
 
     password: joi.string()
-    .alphanum()
-    .min(60)
-    .max(60)
-    .required(),
-
-    role: joi.number()
-    .allow(0,1)
-    .required(),
-
-    gender: joi.number()
-    .allow(0,1)
-    .required(),
-
-    authorized: joi.boolean(),
-
-    optin: joi.boolean(),
-
-    double_optin: joi.boolean()    
-
+    .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
 })
+
+module.exports = schema;

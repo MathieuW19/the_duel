@@ -4,6 +4,8 @@ const router = express.Router();
 const data = require('../data/users');
 const { v4: uuidv4 } = require('uuid');
 const knex = require('../knex');
+const joi = require('../model/user.validator');
+const bcrypt = require('bcryptjs');
 const TABLE = 'users';
 
 
@@ -24,6 +26,12 @@ router.post('/', async (req, res, next) => {
   let users;
 
   req.body.uuid = uuidv4();
+  const salt = bcrypt.genSaltSync(10);
+  req.body.password = bcrypt.hashSync(req.body.password, salt);
+
+  let test = joi.validateAsync(req.body);
+  console.log(test);
+
   knex(TABLE).insert(req.body).then(() => console.log("data inserted"))
     .catch((err) => { console.log(err); throw err })
     .finally(() => {
@@ -40,9 +48,10 @@ router.post('/', async (req, res, next) => {
 
 router.put('/:uuid', async (req, res, next) => {
   const uuid = req.params.uuid;
-  const { lastname, firstname, email, password } = req.body;
   let users;
 
+  const salt = bcrypt.genSaltSync(10);
+  req.body.password = bcrypt.hashSync(req.body.password, salt);
   try {
     await knex(TABLE).where({ uuid }).update(req.body);
   } catch (error) {
@@ -75,19 +84,16 @@ router.delete('/:uuid', async (req, res, next) => {
   res.status(200).json({ items: users });
 });
 
-router.get('/:uuid', function (req, res, next) {
+router.get('/:uuid', async (req, res, next) => {
   const uuid = req.params.uuid;
+  let users;
 
-  const item = data.find(d => d.uuid === uuid);
-
-  if (item !== undefined)
-    res.status(200).json({ item: item });
-  else {
-    const error = new Error();
-    error.status = 400;
-    error.message = "Aucun élément avec ce uuid";
-    throw error;
+  try {
+    users = await knex(TABLE).where({ uuid }).select('*');
+  } catch (error) {
+    next(500);
   }
+  res.status(200).json({ items: users });
 
 });
 
