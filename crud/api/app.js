@@ -6,6 +6,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 
 const usersRouter = require('./routes/users');
+const middle = require('./middleware/Token');
 
 
 const app = express();
@@ -17,7 +18,8 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use('/users', usersRouter);
+app.use('/users',usersRouter);
+app.use('/middle', middle);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

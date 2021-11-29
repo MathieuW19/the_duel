@@ -8,9 +8,14 @@ const joi = require('../model/user.validator');
 const bcrypt = require('bcryptjs');
 const TABLE = 'users';
 const jwt = require('jsonwebtoken');
-const token = require('crypto').randomBytes(64).toString('hex');
+const dotenv = require('dotenv');
+const middle = require('../middleware/Token');
 
 
+function generateAccessToken(username) {
+  dotenv.config();
+  return jwt.sign(username, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+}
 
 router.get('/', async (req, res, next) => {
   let users;
@@ -20,11 +25,8 @@ router.get('/', async (req, res, next) => {
   } catch (error) {
     next(500);
   }
- // jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' }, function(err, token) {
-    console.log(token);
-  //});  
 
-  res.status(200).json({ items: users });
+  //res.status(200).json({ items: users });
 
 });
 
@@ -90,16 +92,19 @@ router.delete('/:uuid', async (req, res, next) => {
   res.status(200).json({ items: users });
 });
 
-router.get('/:uuid', async (req, res, next) => {
+router.get('/:uuid',middle, async (req, res, next) => {
   const uuid = req.params.uuid;
   let users;
+
+  const token = generateAccessToken({ username: req.params.uuid });
+  res.json(token); 
 
   try {
     users = await knex(TABLE).where({ uuid }).select('*');
   } catch (error) {
     next(500);
   }
-  res.status(200).json({ items: users });
+  //res.status(200).json({ items: users });
 
 });
 
