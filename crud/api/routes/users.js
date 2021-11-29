@@ -7,6 +7,9 @@ const knex = require('../knex');
 const joi = require('../model/user.validator');
 const bcrypt = require('bcryptjs');
 const TABLE = 'users';
+const jwt = require('jsonwebtoken');
+const token = require('crypto').randomBytes(64).toString('hex');
+
 
 
 router.get('/', async (req, res, next) => {
@@ -17,6 +20,9 @@ router.get('/', async (req, res, next) => {
   } catch (error) {
     next(500);
   }
+ // jwt.sign({ foo: 'bar' }, privateKey, { algorithm: 'RS256' }, function(err, token) {
+    console.log(token);
+  //});  
 
   res.status(200).json({ items: users });
 

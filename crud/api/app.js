@@ -5,9 +5,7 @@ const compression = require('compression');
 const cors = require('cors');
 const helmet = require('helmet');
 
-const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
-const tasksRouter = require('./routes/tasks');
 
 
 const app = express();
